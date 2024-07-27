@@ -3,16 +3,6 @@ variable "env" {
   default     = "dev"
 }
 
-variable "shared_rg_name" {
-  description = "The resource group name for storing tfstate files."
-  default     = "rg-netasset-shared-francecentral"
-}
-
-variable "terraform_states_container_key" {
-  description = "The key for the storage account container storing tfstate files."
-  default     = "netasset.dev.tfstate"
-}
-
 variable "app_name" {
   description = "The name of the app."
   default     = "netasset"
