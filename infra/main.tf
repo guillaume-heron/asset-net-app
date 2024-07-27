@@ -1,9 +1,9 @@
 terraform {
   backend "azurerm" {
-    resource_group_name     = var.shared_rg_name
+    resource_group_name     = "rg-${var.app_name}-shared-${var.app_location}"
     storage_account_name    = "st${var.app_name}tfstates"
     container_name          = "tfstates"
-    key                     = var.terraform_states_container_key
+    key                     = "${var.app_name}.${var.env}.tfstate"
   }
   required_providers {
     azurerm = {
