@@ -1,10 +1,5 @@
 terraform {
-  backend "azurerm" {
-    resource_group_name  = "rg-${var.app_name}-shared-${var.app_location}"
-    storage_account_name = "st${var.app_name}tfstates"
-    container_name       = "tfstates"
-    key                  = "${var.app_name}.${var.env}.tfstate"
-  }
+  backend "azurerm" {}
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -17,7 +12,11 @@ provider "azurerm" {
   features {}
 }
 
+locals {
+  resource_group_name = "rg-${var.app_name}-${var.env}-${var.app_location}"
+}
+
 resource "azurerm_resource_group" "rg" {
-  name     = "rg-${var.app_name}-${var.env}-${var.app_location}"
+  name     = local.resource_group_name
   location = var.app_location
 }
