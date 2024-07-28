@@ -15,13 +15,13 @@ resource "azurerm_service_plan" "appserviceplan" {
 
 # Create the web app
 resource "azurerm_linux_web_app" "webapp" {
-  name                  = "app-netasset-${local.environment}-${azurerm_resource_group.rg.location}"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
-  service_plan_id       = azurerm_service_plan.appserviceplan.id
-  https_only            = true
+  name                = "app-netasset-${local.environment}-${azurerm_resource_group.rg.location}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  service_plan_id     = azurerm_service_plan.appserviceplan.id
+  https_only          = true
 
-  site_config { 
+  site_config {
     minimum_tls_version = "1.2"
 
     application_stack {
