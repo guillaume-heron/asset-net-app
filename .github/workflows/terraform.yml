@@ -64,10 +64,6 @@ jobs:
         -backend-config="storage_account_name=st${{ vars.APP_NAME }}tfstates" \
         -backend-config="container_name=tfstates" \
         -backend-config="key=${{ vars.APP_NAME }}.${{ env.ENV }}.tfstate"
-      env:
-        TF_VAR_app_name: ${{ vars.APP_NAME }}
-        TF_VAR_app_location: ${{ vars.APP_LOCATION }}
-        TF_VAR_env: ${{ env.ENV }}
 
     # Validate
     - name: Terraform Validate
@@ -78,6 +74,10 @@ jobs:
     - name: Terraform Plan
       id: plan
       run: terraform plan -input=false
+      env:
+        TF_VAR_app_name: ${{ vars.APP_NAME }}
+        TF_VAR_app_location: ${{ vars.APP_LOCATION }}
+        TF_VAR_env: ${{ env.ENV }}
 
       # On push to "develop", build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". 
