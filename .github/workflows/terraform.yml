@@ -87,3 +87,7 @@ jobs:
       id: apply
       if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.plan.outcome == 'success'
       run: terraform apply -auto-approve -input=false
+      env:
+        TF_VAR_app_name: ${{ vars.APP_NAME }}
+        TF_VAR_app_location: ${{ vars.APP_LOCATION }}
+        TF_VAR_env: ${{ env.ENV }}
