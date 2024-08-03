@@ -1,20 +1,13 @@
-name: 'Terraform'
+name: 'Terraform Deployment'
 
 on:
-  pull_request:
-    branches: 
-      - develop
-      - main
-    paths:
-      - infra/**
-      - .github/workflows/terraform.yml
   push:
     branches: 
       - develop
       - main
     paths:
       - infra/**
-      - .github/workflows/terraform.yml
+      - .github/workflows/**
   workflow_dispatch:
 
 env:
@@ -32,30 +25,24 @@ jobs:
     name: 'Terraform'
     runs-on: ubuntu-latest
 
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
         working-directory: "./infra"
 
     steps:
-    # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v4
 
-    # Install the latest version of Terraform CLI
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: 1.9.3
 
-    # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
       id: fmt
       run: terraform fmt -check
 
-    # Initialize a new or existing Terraform working directory by creating initial files, 
-    # loading any remote state, downloading modules, etc.
     - name: Terraform Init
       id: init
       run: |
@@ -65,12 +52,10 @@ jobs:
         -backend-config="container_name=tfstates" \
         -backend-config="key=${{ vars.APP_NAME }}.${{ env.ENV }}.tfstate"
 
-    # Validate
     - name: Terraform Validate
       id: validate
       run: terraform validate -no-color
 
-    # Generates an execution plan for Terraform
     - name: Terraform Plan
       id: plan
       run: terraform plan -input=false
@@ -79,10 +64,6 @@ jobs:
         TF_VAR_app_location: ${{ vars.APP_LOCATION }}
         TF_VAR_env: ${{ env.ENV }}
 
-      # On push to "develop", build or change infrastructure according to Terraform configuration files
-      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". 
-      # See the documentation on "strict" required status checks for more information: 
-      # https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
     - name: Terraform Apply
       id: apply
       if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.plan.outcome == 'success'
