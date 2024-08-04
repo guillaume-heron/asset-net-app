@@ -1,13 +1,20 @@
-name: 'Terraform Deployment'
+name: 'Infrastructure Build'
 
 on:
+  pull_request:
+    branches: 
+      - develop
+      - main
+    paths:
+      - infra/**
+      - .github/workflows/terraform.yml
   push:
     branches: 
       - develop
       - main
     paths:
       - infra/**
-      - .github/workflows/terraform-*.yml
+      - .github/workflows/terraform.yml
   workflow_dispatch:
 
 env:
@@ -31,18 +38,20 @@ jobs:
         working-directory: "./infra"
 
     steps:
+    # Repository checkout
     - name: Checkout
       uses: actions/checkout@v4
 
+    # Setup Terraform
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: 1.9.3
 
+    # Format Terraform
     - name: Terraform Format
       id: fmt
       run: terraform fmt -check
 
+    # Initialize Terraform with backend configuration
     - name: Terraform Init
       id: init
       run: |
@@ -52,23 +61,25 @@ jobs:
         -backend-config="container_name=tfstates" \
         -backend-config="key=${{ vars.APP_NAME }}.${{ env.ENV }}.tfstate"
 
+    # Validate Terraform
     - name: Terraform Validate
       id: validate
       run: terraform validate -no-color
 
+    # Initialize terraform.tfvars to set variable values that override the defaults specified in variables.tf
+    - name: Create terraform.tfvars
+      run: |
+        echo "env=\"${{ env.ENV }}\"" > terraform.tfvars
+        echo "app_name=\"${{ vars.APP_NAME }}\"" >> terraform.tfvars
+        echo "app_location=\"${{ vars.APP_LOCATION }}\"" >> terraform.tfvars
+
+    # Terraform plan
     - name: Terraform Plan
       id: plan
       run: terraform plan -input=false
-      env:
-        TF_VAR_app_name: ${{ vars.APP_NAME }}
-        TF_VAR_app_location: ${{ vars.APP_LOCATION }}
-        TF_VAR_env: ${{ env.ENV }}
 
+    # Terraform apply (only on push)
     - name: Terraform Apply
       id: apply
       if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.plan.outcome == 'success'
       run: terraform apply -auto-approve -input=false
-      env:
-        TF_VAR_app_name: ${{ vars.APP_NAME }}
-        TF_VAR_app_location: ${{ vars.APP_LOCATION }}
-        TF_VAR_env: ${{ env.ENV }}
