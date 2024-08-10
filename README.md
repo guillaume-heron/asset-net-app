@@ -39,3 +39,9 @@ Récupération de la clé d'accès pour la création du container :
 Création du container qui hébergera les fichiers tfstates :
 <br/>
 <code>az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME --account-key "{key}"</code>
+
+## Conteneurisation
+
+<code>docker build -t my-web-api .</code>
+
+<code>docker run --rm -it -p 8000:80 -e ASPNETCORE_HTTP_PORTS=80 my-web-api</code>
