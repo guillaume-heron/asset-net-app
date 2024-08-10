@@ -13,5 +13,5 @@ variable "app_name" {
 variable "app_location" {
   description = "The location of the app."
   type        = string
-  default     = "francecentral"
+  default     = "westeurope"
 }
