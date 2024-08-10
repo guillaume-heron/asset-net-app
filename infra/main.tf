@@ -48,7 +48,7 @@ resource "azurerm_linux_web_app" "webapp" {
 
     application_stack {
       docker_image_name   = var.app_name
-      docker_registry_url = azurerm_container_registry.acr.login_server
+      docker_registry_url = "https://${local.container_registry_name}.azurecr.io"
     }
   }
 
