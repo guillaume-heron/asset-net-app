@@ -1,4 +1,8 @@
-# asset-net-app
+# Asset .Net Web API with infrastructure (terrafom)
+
+![infrastructure deploy](https://github.com/guillaume-heron/asset-net-app/actions/workflows/terraform-cd.yml/badge.svg)
+![webapp deploy](https://github.com/guillaume-heron/asset-net-app/actions/workflows/dotnet-webapp-deploy.yml/badge.svg)
+
 
 ## Infra
 

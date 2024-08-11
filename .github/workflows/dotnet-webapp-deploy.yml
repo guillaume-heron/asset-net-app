@@ -1,4 +1,4 @@
-name: Deploy .NET Web App
+name: '.Net Web API'
 
 on:
   push:
