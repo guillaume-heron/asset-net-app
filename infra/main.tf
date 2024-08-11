@@ -77,5 +77,5 @@ resource "azurerm_user_assigned_identity" "uai" {
 resource "azurerm_role_assignment" "ra" {
   scope                = azurerm_container_registry.acr.id
   role_definition_name = "AcrPull"
-  principal_id         = azurerm_linux_web_app.webapp.id
+  principal_id         = azurerm_user_assigned_identity.uai.principal_id
 }
