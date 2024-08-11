@@ -1,4 +1,4 @@
-name: 'Infrastructure Build & Deploy'
+name: 'Terraform'
 
 on:
   push:
