@@ -1,0 +1,72 @@
+name: 'Infrastructure Build'
+
+on:
+  pull_request:
+    branches: 
+      - develop
+      - main
+    paths:
+      - infra/**
+      - .github/workflows/terraform-*.yml
+  workflow_dispatch:
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ENV: ${{ github.ref == 'refs/heads/main' && 'prd' || 'dev' }}
+
+permissions:
+  contents: read
+
+jobs:
+  terraform-build:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: "./infra"
+
+    steps:
+    # Repository checkout
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Setup Terraform
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    # Format Terraform
+    - name: Terraform Format
+      id: fmt
+      run: terraform fmt -check
+
+    # Initialize Terraform with backend configuration
+    - name: Terraform Init
+      id: init
+      run: |
+        terraform init \
+        -backend-config="resource_group_name=rg-${{ vars.APP_NAME }}-shared-${{ vars.APP_LOCATION }}" \
+        -backend-config="storage_account_name=st${{ vars.APP_NAME }}tfstates" \
+        -backend-config="container_name=tfstates" \
+        -backend-config="key=${{ vars.APP_NAME }}.${{ env.ENV }}.tfstate"
+
+    # Validate Terraform
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+
+    # Initialize terraform.tfvars to set variable values that override the defaults specified in variables.tf
+    - name: Create terraform.tfvars
+      run: |
+        echo "env=\"${{ env.ENV }}\"" > terraform.tfvars
+        echo "app_name=\"${{ vars.APP_NAME }}\"" >> terraform.tfvars
+        echo "app_location=\"${{ vars.APP_LOCATION }}\"" >> terraform.tfvars
+
+    # Terraform plan
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -input=false
