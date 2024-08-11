@@ -15,7 +15,6 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  ARM_EA_OBJECT_ID: ${{ secrets.ARM_EA_OBJECT_ID }}
   ENV: ${{ github.ref == 'refs/heads/main' && 'prd' || 'dev' }}
 
 permissions:
@@ -23,7 +22,7 @@ permissions:
 
 jobs:
   terraform-build-deploy:
-    name: 'Terraform'
+    name: 'Terraform Build and Deploy'
     runs-on: ubuntu-latest
 
     defaults:
@@ -72,33 +71,8 @@ jobs:
       id: plan
       run: terraform plan -input=false
 
-    # Add SPN RBAC Admin Role
-    - name: Add SPN RBAC Admin Role
-      if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.plan.outcome == 'success'
-      run: |
-        az login --service-principal \
-          -u ${{ secrets.AZURE_CLIENT_ID }} \
-          -p ${{ secrets.AZURE_CLIENT_SECRET }} \
-          --tenant ${{ secrets.AZURE_TENANT_ID }}
-        az role assignment create \
-          --assignee "${{ env.ARM_EA_OBJECT_ID }}" \
-          --role "Role Based Access Control Administrator" \
-          --scope "/subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/rg-${{ vars.APP_NAME }}-${{ env.ENV }}-${{ vars.APP_LOCATION }}/providers/Microsoft.ContainerRegistry/registries/acr${{ vars.APP_NAME }}${{ env.ENV }}${{ vars.APP_LOCATION }}"
-
     # Terraform apply (only on push)
     - name: Terraform Apply
       id: apply
-      if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.plan.outcome == 'success'
+      if: steps.plan.outcome == 'success'
       run: terraform apply -auto-approve -input=false
-
-    # Delete SPN RBAC Admin Role
-    - name: Delete SPN RBAC Admin Role
-      run: |
-        az login --service-principal \
-          -u ${{ secrets.AZURE_CLIENT_ID }} \
-          -p ${{ secrets.AZURE_CLIENT_SECRET }} \
-          --tenant ${{ secrets.AZURE_TENANT_ID }}
-        az role assignment delete \
-          --assignee "${{ env.ARM_EA_OBJECT_ID }}" \
-          --role "Role Based Access Control Administrator"
-          --scope "/subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/rg-${{ vars.APP_NAME }}-${{ env.ENV }}-${{ vars.APP_LOCATION }}/providers/Microsoft.ContainerRegistry/registries/acr${{ vars.APP_NAME }}${{ env.ENV }}${{ vars.APP_LOCATION }}"
