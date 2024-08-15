@@ -56,7 +56,7 @@ resource "azurerm_linux_web_app" "webapp" {
   }
 
   identity {
-    type         = "SystemAssigned, UserAssigned"
+    type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.uai.id]
   }
 
