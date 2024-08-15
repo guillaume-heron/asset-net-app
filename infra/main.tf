@@ -46,14 +46,17 @@ resource "azurerm_linux_web_app" "webapp" {
     minimum_tls_version = "1.2"
     always_on           = false
 
+    container_registry_use_managed_identity       = true
+    container_registry_managed_identity_client_id = azurerm_user_assigned_identity.uai.client_id
+
     application_stack {
-      docker_image_name   = var.app_name
+      docker_image_name   = "${var.app_name}:latest"
       docker_registry_url = "https://${local.container_registry_name}.azurecr.io"
     }
   }
 
   identity {
-    type         = "UserAssigned"
+    type         = "SystemAssigned, UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.uai.id]
   }
 

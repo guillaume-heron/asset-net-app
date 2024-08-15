@@ -46,6 +46,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'app-${{ vars.APP_NAME }}-${{ env.ENV }}-${{ vars.APP_LOCATION }}'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: "acr${{ vars.APP_NAME }}${{ env.ENV }}${{ vars.APP_LOCATION }}.azurecr.io/${{ vars.APP_NAME }}:${{ github.sha }}"
     
