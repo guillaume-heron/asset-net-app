@@ -1,4 +1,4 @@
-name: 'Deploy Terraform state'
+name: 'Terraform State Deployment'
 
 on:
   workflow_dispatch:
