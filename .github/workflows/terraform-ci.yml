@@ -7,7 +7,7 @@ on:
       - main
     paths:
       - infra/**
-      - .github/workflows/terraform-*.yml
+      - .github/workflows/terraform-ci.yml
 
 env:
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
