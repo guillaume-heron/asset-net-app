@@ -1,32 +1,48 @@
 # Asset .Net Web API with infrastructure (terrafom)
 
+![infrastructure state deployment](https://github.com/guillaume-heron/asset-net-app/actions/workflows/terraform-state.yml/badge.svg)
 ![infrastructure deployment](https://github.com/guillaume-heron/asset-net-app/actions/workflows/terraform-cd.yml/badge.svg)
 ![webapp deployment](https://github.com/guillaume-heron/asset-net-app/actions/workflows/dotnet-webapp-deploy.yml/badge.svg)
-![infrastructure state deployment](https://github.com/guillaume-heron/asset-net-app/actions/workflows/terraform-state.yml/badge.svg)
 
 
-## Infra
+## Introduction
 
-### Prérequis
+Le but de ce repository est de servir de "template" dans le processus de <code>Build & Deploy</code> d'une Web API en utilisant <b>Terraform</b> et les <b>Github Actions</b> pour le déploiement de notre infrastructure et de nos services.
 
-#### Connexion à la CLI Azure
+Pour notre exemple, nous allons déployer une Web API .Net dans Azure sur une App Service en tant que container.
 
-La première étapt est de vérifier que vous avez bien la CLI d'Azure d'installée.<br/>
+Toutes les étapes nécessaires sont décrites ci-dessous, et le code mis à disposition dans le repo associé.
+
+## Prérequis
+
+### Compte Azure
+
+Si vous n'avez pas déjà de compte Azure et d'un abonnement valide, je vous invite à en créer un directement depuis le portail Azure : https://azure.microsoft.com/en-us/pricing/purchase-options/azure-account<br/>
+
+Cette étape est obligatoire pour la suite.
+
+### Azure CLI
+
+La première étape est de vérifier que vous avez bien la CLI d'Azure d'installée :
+https://learn.microsoft.com/en-us/cli/azure/
+
 Une fois cela effectué, vous pouvez vous connecter à votre subscription.
 
-Connexion au compte azure : 
+- Connexion au compte azure : 
 
-```bash
-az login --tenant <TENANT_ID>
-```
+    ```bash
+    az login --tenant <TENANT_ID>
+    ```
 
-Si vous avez plusieurs abonnements Azure, listez-les et sélectionnez celui que vous souhaitez utiliser :
-```bash
-az account list --output table
-az account set --subscription "<SUBSCRIPTION_ID>"
-```
+- Si vous avez plusieurs abonnements Azure, listez-les et sélectionnez celui que vous souhaitez utiliser :
+    ```bash
+    az account list --output table
+    az account set --subscription "<SUBSCRIPTION_ID>"
+    ```
 
 <br/>
+
+## Infrastructure as Code (Terraform)
 
 ### Création du Service Principal
 
@@ -65,16 +81,20 @@ Sur Github, naviguer dans votre repo puis dans :
 
 Sous l'onglet <code>Secrets</code>, cliquer sur <code>New repository secret</code> puis saisir :
 
-| Name                  | Secret                                                        |
-|---------------------- | ------------------------------------------------------------- |
-| AZURE_CLIENT_ID       | La valeur contenue dans le champ "appId" ci dessus            |
-| AZURE_CLIENT_SECRET   | La valeur contenue dans le champ "password" ci dessus         |
-| AZURE_SUBSCRIPTION_ID | L'Id de votre Subscription (disponible sur le portail Azure)  |
-| AZURE_TENANT_ID       | L'Id de votre Tenant Azure (disponible sur le portail Azure)  |
+| Name                  | Secret                                                                   |
+|---------------------- | ------------------------------------------------------------------------ |
+| AZURE_CLIENT_ID       | La valeur présente dans le champ <code>appId</code> ci dessus            |
+| AZURE_CLIENT_SECRET   | La valeur présente dans le champ <code>password</code> ci dessus         |
+| AZURE_SUBSCRIPTION_ID | L'Id de votre Subscription (disponible sur le portail Azure)             |
+| AZURE_TENANT_ID       | L'Id de votre Tenant Azure (valeur présente dans le champ <code>tenant</code> ci dessus et sur votre portail Azure)  |
 
 <br/>
 
 ### Création du Resource Group de gestion des tfstates
+
+Terraform a besoin de stocker l'état  de notre infrastructure et sa configuration.<br/>
+
+Pour cela, nous allons créer un Groupe de Ressources spécifique dans Azure avec un Compte de Stockage, dans lequel notre configuration sera stockée.
 
 #### Méthod n°1 : Création manuelle
 
@@ -110,15 +130,25 @@ Exécuter ensuite les commandes suivantes :
     ```
 <br/>
 
-#### Méthod n°2 : via Github Actions
+#### Méthod n°2 : via Github Actions (recommandé)
 
-Afin d'éviter au maximum de donner des privilèges ou permissions trop élevés aux utilisateurs, et que nous avons précédemment configurer un Service Principal pour se connecter à Azure depuis nos Github Actions, nous pouvons de la même manière créer une Github action pour créer les ressources nécessaires pour la gestion du state Terraform.
+Afin d'éviter au maximum de donner des privilèges ou permissions trop élevés aux utilisateurs, et comme nous avons précédemment configuré un Service Principal pour se connecter à Azure depuis nos Github Actions, nous pouvons de la même manière créer une Github action pour créer les ressources nécessaires pour la gestion du state Terraform.
 
 Le workflow associé est décrit dans le fichier <code>terraform-state.yml</code>.
 
 <br/>
 
-## Conteneurisation
+### Déploiement de notre infrastructure principale
+
+En cours...
+<br/>
+
+## Build & Deploy de notre API
+
+En cours...
+<br/>
+
+## Développement local
 
 ```bash
 docker build -t my-web-api .
