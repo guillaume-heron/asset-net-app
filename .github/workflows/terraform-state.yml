@@ -33,7 +33,7 @@ jobs:
             --location ${{ env.LOCATION }}
           az storage account create \
             --name ${{ env.STATE_STORAGE_ACCOUNT_NAME }} \
-            --group ${{ env.STATE_RG_NAME }} \
+            --resource-group ${{ env.STATE_RG_NAME }} \
             --location ${{ env.LOCATION }} \
             --sku Standard_LRS \
             --encryption-services blob \
