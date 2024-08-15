@@ -1,0 +1,43 @@
+name: 'Deploy Terraform state'
+
+on:
+  workflow_dispatch:
+
+env:
+  LOCATION: ${{ vars.APP_LOCATION }}
+  STATE_RG_NAME: "rg-${{ vars.APP_NAME }}-shared-${{ vars.APP_LOCATION }}"
+  STATE_STORAGE_ACCOUNT_NAME: "st${{ vars.APP_NAME }}tfstates"
+  STATE_CONTAINER_NAME: "tfstates"
+
+jobs:
+  deploy:
+    name: 'Deploy Terraform state'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+
+      - name: 'Deploy state'
+        run: |
+          az login --service-principal \
+            --user ${{ secrets.AZURE_CLIENT_ID }} \
+            --password ${{ secrets.AZURE_CLIENT_SECRET }} \
+            --tenant ${{ secrets.AZURE_TENANT_ID }}
+          az group create \
+            --name ${{ env.STATE_RG_NAME }} \
+            --location ${{ env.LOCATION }}
+          az storage account create \
+            --name ${{ env.STATE_STORAGE_ACCOUNT_NAME }} \
+            --group ${{ env.STATE_RG_NAME }} \
+            --location ${{ env.LOCATION }} \
+            --sku Standard_LRS \
+            --encryption-services blob \
+            --allow-blob-public-access false
+          az storage container create \
+            --name ${{ env.STATE_CONTAINER_NAME }} \
+            --account-name ${{ env.STATE_STORAGE_ACCOUNT_NAME }}
