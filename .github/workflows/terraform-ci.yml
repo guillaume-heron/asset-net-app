@@ -48,10 +48,10 @@ jobs:
       id: init
       run: |
         terraform init \
-        -backend-config="resource_group_name=rg-${{ vars.APP_NAME }}-shared-${{ vars.APP_LOCATION }}" \
-        -backend-config="storage_account_name=st${{ vars.APP_NAME }}tfstates" \
-        -backend-config="container_name=tfstates" \
-        -backend-config="key=${{ vars.APP_NAME }}.${{ env.ENV }}.tfstate"
+          -backend-config="resource_group_name=rg-${{ vars.APP_NAME }}-shared-${{ vars.APP_LOCATION }}" \
+          -backend-config="storage_account_name=st${{ vars.APP_NAME }}tfstates" \
+          -backend-config="container_name=tfstates" \
+          -backend-config="key=${{ vars.APP_NAME }}.${{ env.ENV }}.tfstate"
 
     # Validate Terraform
     - name: Terraform Validate
