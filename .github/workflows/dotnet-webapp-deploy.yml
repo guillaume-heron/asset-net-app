@@ -55,6 +55,19 @@ jobs:
           app-name: 'app-${{ vars.APP_NAME }}-${{ env.ENV }}-${{ vars.APP_LOCATION }}'
           images: "acr${{ vars.APP_NAME }}${{ env.ENV }}${{ vars.APP_LOCATION }}.azurecr.io/${{ vars.APP_NAME }}:${{ github.sha }}"
     
+      - name: 'Set environment variables'
+        uses: azure/appservice-settings@v1
+        with:
+          app-name: 'app-${{ vars.APP_NAME }}-${{ env.ENV }}-${{ vars.APP_LOCATION }}'
+          app-settings-json: |
+            [
+                {
+                    "name": "WEBSITES_PORT",
+                    "value": 8080,
+                    "slotSetting": false
+                },
+            ]
+
       - name: 'Azure logout'
         run: |
           az logout
