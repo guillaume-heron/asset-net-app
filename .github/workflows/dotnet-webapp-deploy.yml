@@ -13,6 +13,7 @@ on:
 env:
   DOTNET_VERSION: '8.x'
   ENV: ${{ github.ref == 'refs/heads/main' && 'prd' || 'dev' }}
+  REGISTRY_LOGIN_SERVER: 'acrhubshared${{ vars.APP_LOCATION }}.azurecr.io'
     
 jobs:
   deploy:
@@ -38,22 +39,22 @@ jobs:
         id: login
         uses: docker/login-action@v3
         with:
-          registry: "acr${{ vars.APP_NAME }}${{ env.ENV }}${{ vars.APP_LOCATION }}.azurecr.io"
+          registry: ${{ env.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.AZURE_CLIENT_ID }}
           password: ${{ secrets.AZURE_CLIENT_SECRET }}
 
       - name: 'Build image and push to ACR'
         if: steps.login.outcome == 'success'
         run: |
-          docker build . -t acr${{ vars.APP_NAME }}${{ env.ENV }}${{ vars.APP_LOCATION }}.azurecr.io/${{ vars.APP_NAME }}:${{ github.sha }}
-          docker push acr${{ vars.APP_NAME }}${{ env.ENV }}${{ vars.APP_LOCATION }}.azurecr.io/${{ vars.APP_NAME }}:${{ github.sha }}
+          docker build . -t ${{ env.REGISTRY_LOGIN_SERVER }}/${{ vars.APP_NAME }}-${{ env.ENV }}:${{ github.sha }}
+          docker push ${{ env.REGISTRY_LOGIN_SERVER }}/${{ vars.APP_NAME }}-${{ env.ENV }}:${{ github.sha }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'app-${{ vars.APP_NAME }}-${{ env.ENV }}-${{ vars.APP_LOCATION }}'
-          images: "acr${{ vars.APP_NAME }}${{ env.ENV }}${{ vars.APP_LOCATION }}.azurecr.io/${{ vars.APP_NAME }}:${{ github.sha }}"
+          images: '${{ env.REGISTRY_LOGIN_SERVER }}/${{ vars.APP_NAME }}-${{ env.ENV }}:${{ github.sha }}'
     
       - name: 'Set environment variables'
         uses: azure/appservice-settings@v1
