@@ -1,6 +1,6 @@
-# Create the resource group
-resource "azurerm_resource_group" "rg" {
-  name     = local.resource_group_name
+# Create the dedicated Resource Group for Azure Container Registry
+resource "azurerm_resource_group" "acrrg" {
+  name     = local.resource_group_name_acr
   location = var.app_location
 
   tags = {
@@ -11,8 +11,8 @@ resource "azurerm_resource_group" "rg" {
 # Create an Azure Container Registry
 resource "azurerm_container_registry" "acr" {
   name                = local.container_registry_name
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.acrrg.name
+  location            = azurerm_resource_group.acrrg.location
   sku                 = "Standard"
   admin_enabled       = false
 
@@ -21,11 +21,32 @@ resource "azurerm_container_registry" "acr" {
   }
 }
 
+# Create the Resource Group
+resource "azurerm_resource_group" "apprg" {
+  name     = local.resource_group_name
+  location = var.app_location
+
+  tags = {
+    Environment = local.environment
+  }
+}
+
+# Create a User Assigned Identity
+resource "azurerm_user_assigned_identity" "uai" {
+  resource_group_name = azurerm_resource_group.apprg.name
+  location            = azurerm_resource_group.apprg.location
+  name                = local.user_assigned_identity_name
+
+  tags = {
+    Environment = local.environment
+  }
+}
+
 # Create the Linux App Service Plan
 resource "azurerm_service_plan" "appserviceplan" {
-  name                = "asp-${var.app_name}-${local.environment}-${azurerm_resource_group.rg.location}"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  name                = "asp-${var.app_name}-${local.environment}-${azurerm_resource_group.apprg.location}"
+  location            = azurerm_resource_group.apprg.location
+  resource_group_name = azurerm_resource_group.apprg.name
   os_type             = "Linux"
   sku_name            = "F1"
 
@@ -34,11 +55,11 @@ resource "azurerm_service_plan" "appserviceplan" {
   }
 }
 
-# Create the web app
+# Create the Web App
 resource "azurerm_linux_web_app" "webapp" {
-  name                = "app-${var.app_name}-${local.environment}-${azurerm_resource_group.rg.location}"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  name                = "app-${var.app_name}-${local.environment}-${azurerm_resource_group.apprg.location}"
+  location            = azurerm_resource_group.apprg.location
+  resource_group_name = azurerm_resource_group.apprg.name
   service_plan_id     = azurerm_service_plan.appserviceplan.id
   https_only          = true
 
@@ -50,7 +71,7 @@ resource "azurerm_linux_web_app" "webapp" {
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.uai.client_id
 
     application_stack {
-      docker_image_name   = "${var.app_name}:latest"
+      docker_image_name   = "${var.app_name}-${local.environment}:latest"
       docker_registry_url = "https://${local.container_registry_name}.azurecr.io"
     }
   }
@@ -59,17 +80,6 @@ resource "azurerm_linux_web_app" "webapp" {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.uai.id]
   }
-
-  tags = {
-    Environment = local.environment
-  }
-}
-
-# Create a User Assigned Identity for Container Registry
-resource "azurerm_user_assigned_identity" "uai" {
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  name                = local.user_assigned_identity_name
 
   tags = {
     Environment = local.environment
