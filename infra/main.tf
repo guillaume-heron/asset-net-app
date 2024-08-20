@@ -90,7 +90,8 @@ resource "azurerm_linux_web_app" "webapp" {
   }
 
   app_settings = {
-    APPINSIGHTS_INSTRUMENTATIONKEY = module.application_insights.instrumentation_key
+    APPLICATIONINSIGHTS_CONNECTION_STRING      = module.application_insights.connection_string
+    ApplicationInsightsAgent_EXTENSION_VERSION = "~3"
   }
 
   tags = {
