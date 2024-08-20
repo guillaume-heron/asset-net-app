@@ -1,4 +1,4 @@
-# Asset .Net Web API with infrastructure (terrafom)
+# Déploiement d'une Web API .Net et de l'infrastructure (Terraform) via Github Actions
 
 ![infrastructure state deployment](https://github.com/guillaume-heron/asset-net-app/actions/workflows/terraform-state.yml/badge.svg)
 ![infrastructure deployment](https://github.com/guillaume-heron/asset-net-app/actions/workflows/terraform-cd.yml/badge.svg)
@@ -11,7 +11,7 @@ Le but de ce repository est de servir de "template" dans le processus de <code>B
 
 Pour notre exemple, nous allons déployer une Web API .Net dans Azure sur une App Service en tant que container.
 
-Toutes les étapes nécessaires sont décrites ci-dessous, et le code mis à disposition dans le repo associé.
+Toutes les étapes nécessaires sont décrites ci-dessous, et le code mis à disposition dans le repository.
 
 ## Prérequis
 
@@ -31,7 +31,7 @@ Une fois cela effectué, vous pouvez vous connecter à votre subscription.
 - Connexion au compte azure : 
 
     ```bash
-    az login --tenant <TENANT_ID>
+    az login --tenant "<TENANT_ID>"
     ```
 
 - Si vous avez plusieurs abonnements Azure, listez-les et sélectionnez celui que vous souhaitez utiliser :
@@ -42,11 +42,13 @@ Une fois cela effectué, vous pouvez vous connecter à votre subscription.
 
 <br/>
 
-## Infrastructure as Code (Terraform)
+### Authentification à Azure depuis les Github Actions
 
-### Création du Service Principal
+https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-openid-connect
 
-En premier lieu, il est nécessaire de créer un Service Principal qui aura seul les permissions pour déployer notre infrastructure. De cette façon, on s'affranchit de donner des accès avec privilèges aux membres de notre équipe.
+#### Création du Service Principal
+
+En premier lieu, il est nécessaire de créer un Service Principal qui aura seul les permissions pour déployer notre infrastructure (ressources dans Azure). De cette façon, on évite de donner des accès avec privilèges aux membres de notre équipe.
 
 Création du SPN  : 
 ```bash
@@ -74,7 +76,7 @@ Afin que les Github Actions puissent utiliser le Service Principal pour s'authen
 
 <br/>
 
-### Mise en place des secrets dans Github
+#### Mise en place des secrets dans Github
 
 Sur Github, naviguer dans votre repo puis dans : 
 <code>Settings > Security > Secrets and variables > Actions</code>
@@ -90,9 +92,11 @@ Sous l'onglet <code>Secrets</code>, cliquer sur <code>New repository secret</cod
 
 <br/>
 
-### Création du Resource Group de gestion des tfstates
+### Backend Terraform
 
-Terraform a besoin de stocker l'état  de notre infrastructure et sa configuration.<br/>
+#### Création du Resource Group de gestion des tfstates
+
+Terraform a besoin de stocker l'état de notre infrastructure et sa configuration (https://developer.hashicorp.com/terraform/language/state).<br/>
 
 Pour cela, nous allons créer un Groupe de Ressources spécifique dans Azure avec un Compte de Stockage, dans lequel notre configuration sera stockée.
 
@@ -110,23 +114,34 @@ Exécuter ensuite les commandes suivantes :
 
 - Création du groupe de ressources :
     ```bash
-    az group create --name $RESOURCE_GROUP_NAME --location $REGION
+    az group create \
+        --name $RESOURCE_GROUP_NAME \
+        --location $REGION
     ```
 
 - Création du compte de stockage :
     ```bash
-    az storage account create --resource-group $RESOURCE_GROUP_NAME --name $STORAGE_ACCOUNT_NAME --sku Standard_LRS --encryption-services blob
+    az storage account create \ 
+        --resource-group $RESOURCE_GROUP_NAME \
+        --name $STORAGE_ACCOUNT_NAME \
+        --sku Standard_LRS \
+        --encryption-services blob
     ```
 
 - Récupération de la clé d'accès pour la création du container :
     ```bash
-    az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME
+    az storage account keys list \
+        --resource-group $RESOURCE_GROUP_NAME \
+        --account-name $STORAGE_ACCOUNT_NAME
     ```
 
 
 - Création du container qui hébergera les fichiers tfstates :
     ```bash
-    az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME --account-key "{key}"
+    az storage container create \
+        --name $CONTAINER_NAME \
+        --account-name $STORAGE_ACCOUNT_NAME \
+        --account-key "{key}"
     ```
 <br/>
 
@@ -134,18 +149,18 @@ Exécuter ensuite les commandes suivantes :
 
 Afin d'éviter au maximum de donner des privilèges ou permissions trop élevés aux utilisateurs, et comme nous avons précédemment configuré un Service Principal pour se connecter à Azure depuis nos Github Actions, nous pouvons de la même manière créer une Github action pour créer les ressources nécessaires pour la gestion du state Terraform.
 
-Le workflow associé est décrit dans le fichier <code>terraform-state.yml</code>.
+Le workflow associé est décrit dans le fichier <code>.github/workflows/terraform-state.yml</code>.
 
 <br/>
 
-### Déploiement de notre infrastructure principale
+## Mise en place de l'infrastructure
 
-En cours...
+En cours de rédaction...
 <br/>
 
-## Build & Deploy de notre API
+## Description de notre API 
 
-En cours...
+En cours de rédaction...
 <br/>
 
 ## Développement local
