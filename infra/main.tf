@@ -42,6 +42,14 @@ resource "azurerm_user_assigned_identity" "uai" {
   }
 }
 
+module "application_insights" {
+  source = "./modules/application_insights"
+
+  app_name            = var.app_name
+  environment         = local.environment
+  resource_group_name = azurerm_resource_group.apprg.name
+}
+
 # Create the Linux App Service Plan
 resource "azurerm_service_plan" "appserviceplan" {
   name                = "asp-${var.app_name}-${local.environment}-${azurerm_resource_group.apprg.location}"
@@ -79,6 +87,10 @@ resource "azurerm_linux_web_app" "webapp" {
   identity {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.uai.id]
+  }
+
+  app_settings = {
+    APPINSIGHTS_INSTRUMENTATIONKEY = module.application_insights.instrumentation_key
   }
 
   tags = {
