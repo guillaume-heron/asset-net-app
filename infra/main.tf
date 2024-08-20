@@ -31,13 +31,14 @@ module "application_insights" {
   app_name            = var.app_name
   environment         = local.environment
   resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
 }
 
 # Create the Linux App Service Plan
 resource "azurerm_service_plan" "appserviceplan" {
   name                = local.app_service_plan_name
-  location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
   os_type             = "Linux"
   sku_name            = "F1"
 
@@ -49,8 +50,8 @@ resource "azurerm_service_plan" "appserviceplan" {
 # Create the Web App
 resource "azurerm_linux_web_app" "webapp" {
   name                = local.web_app_name
-  location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
   service_plan_id     = azurerm_service_plan.appserviceplan.id
   https_only          = true
 

@@ -9,3 +9,7 @@ variable "app_name" {
 variable "environment" {
   description = "The environment used for all resources"
 }
+
+variable "location" {
+  description = "The region where all the resources will be deployed"
+}
