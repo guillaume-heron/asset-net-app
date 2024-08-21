@@ -13,6 +13,10 @@ Pour notre exemple, nous allons déployer une Web API .Net dans Azure sur une Ap
 
 Toutes les étapes nécessaires sont décrites ci-dessous, et le code mis à disposition dans le repository.
 
+<br/>
+
+<em>PS : Ce repository est en "work in progress" ; chaque aspect (infrastructure, pipelines de ci/cd, application) va évoluer pour proposer une solution globale représentative de réels projets.</em>
+
 ## Prérequis
 
 ### Compte Azure
