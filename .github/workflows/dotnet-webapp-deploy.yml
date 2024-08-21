@@ -13,7 +13,7 @@ on:
 env:
   DOTNET_VERSION: '8.x'
   ENV: ${{ github.ref == 'refs/heads/main' && 'prd' || 'dev' }}
-  REGISTRY_LOGIN_SERVER: 'acrhubshared${{ vars.APP_LOCATION }}.azurecr.io'
+  REGISTRY_LOGIN_SERVER: 'acrhubshared${{ vars.APP_LOCATION_SHORT }}.azurecr.io'
     
 jobs:
   deploy:
@@ -53,7 +53,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'app-${{ vars.APP_NAME }}-${{ env.ENV }}-${{ vars.APP_LOCATION }}'
+          app-name: 'app-${{ vars.APP_NAME }}-${{ env.ENV }}-${{ vars.APP_LOCATION_SHORT }}'
           images: '${{ env.REGISTRY_LOGIN_SERVER }}/${{ vars.APP_NAME }}-${{ env.ENV }}:${{ github.sha }}'
     
       - name: 'Azure logout'

@@ -12,7 +12,7 @@ on:
 env:
   DOTNET_VERSION: '8.x'
   ENV: ${{ github.ref == 'refs/heads/main' && 'prd' || 'dev' }}
-  REGISTRY_LOGIN_SERVER: 'acrhubshared${{ vars.APP_LOCATION }}.azurecr.io'
+  REGISTRY_LOGIN_SERVER: 'acrhubshared${{ vars.APP_LOCATION_SHORT }}.azurecr.io'
     
 jobs:
   build-code:
