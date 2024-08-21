@@ -48,7 +48,7 @@ jobs:
       id: init
       run: |
         terraform init \
-          -backend-config="resource_group_name=rg-${{ vars.APP_NAME }}-shared-${{ vars.APP_LOCATION }}" \
+          -backend-config="resource_group_name=rg-${{ vars.APP_NAME }}-shared-${{ vars.APP_LOCATION_SHORT }}" \
           -backend-config="storage_account_name=st${{ vars.APP_NAME }}tfstates" \
           -backend-config="container_name=tfstates" \
           -backend-config="key=${{ vars.APP_NAME }}.${{ env.ENV }}.tfstate"
@@ -64,6 +64,7 @@ jobs:
         echo "env=\"${{ env.ENV }}\"" > terraform.tfvars
         echo "app_name=\"${{ vars.APP_NAME }}\"" >> terraform.tfvars
         echo "app_location=\"${{ vars.APP_LOCATION }}\"" >> terraform.tfvars
+        echo "app_location_short=\"${{ vars.APP_LOCATION_SHORT }}\"" >> terraform.tfvars
 
     # Terraform plan
     - name: Terraform Plan
