@@ -1,6 +1,6 @@
 # Create Log Analytics Workspace
 resource "azurerm_log_analytics_workspace" "log" {
-  name                = "log-${var.app_name}-${var.environment}-${var.location}"
+  name                = "log-${var.app_name}-${var.environment}-${var.location_short}"
   location            = var.location
   resource_group_name = var.resource_group_name
   sku                 = "PerGB2018"
@@ -13,7 +13,7 @@ resource "azurerm_log_analytics_workspace" "log" {
 
 # Create Application Insights
 resource "azurerm_application_insights" "appi" {
-  name                = "appi-${var.app_name}-${var.environment}-${var.location}"
+  name                = "appi-${var.app_name}-${var.environment}-${var.location_short}"
   location            = var.location
   resource_group_name = var.resource_group_name
   workspace_id        = azurerm_log_analytics_workspace.log.id

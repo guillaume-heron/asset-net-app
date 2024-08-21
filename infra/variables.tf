@@ -15,3 +15,9 @@ variable "app_location" {
   type        = string
   default     = "westeurope"
 }
+
+variable "app_location_short" {
+  description = "Short name for the location of the app."
+  type        = string
+  default     = "westeu"
+}

@@ -13,3 +13,7 @@ variable "environment" {
 variable "location" {
   description = "The region where all the resources will be deployed"
 }
+
+variable "location_short" {
+  description = "The short name of the region to write on the resource name."
+}

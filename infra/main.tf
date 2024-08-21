@@ -1,7 +1,10 @@
+data "azurerm_client_config" "current" {}
+
 module "container_registry" {
   source = "./modules/container_registry"
 
-  location = var.app_location
+  location       = var.app_location
+  location_short = var.app_location_short
 }
 
 # Create the Resource Group
@@ -32,6 +35,42 @@ module "application_insights" {
   environment         = local.environment
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
+  location_short      = var.app_location_short
+}
+
+# Create the Keyvault that will be accessible from our Web App
+resource "azurerm_key_vault" "keyvault" {
+  name                        = local.keyvault_name
+  resource_group_name         = azurerm_resource_group.main.name
+  location                    = azurerm_resource_group.main.location
+  enabled_for_disk_encryption = true
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = false
+
+  sku_name = "standard"
+
+  tags = {
+    Environment = local.environment
+  }
+}
+
+# Set Keyvault access policy
+resource "azurerm_key_vault_access_policy" "keyvault_access_policy" {
+  key_vault_id = azurerm_key_vault.keyvault.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_linux_web_app.webapp.identity[0].principal_id
+
+  secret_permissions = [
+    "Get",
+  ]
+}
+
+# Set keyvault secret for app insights connection string
+resource "azurerm_key_vault_secret" "app_insights_conn_string" {
+  name         = "APPLICATIONINSIGHTS-CONNECTION-STRING"
+  value        = module.application_insights.connection_string
+  key_vault_id = azurerm_key_vault.keyvault.id
 }
 
 # Create the Linux App Service Plan
@@ -69,13 +108,13 @@ resource "azurerm_linux_web_app" "webapp" {
   }
 
   identity {
-    type         = "UserAssigned"
+    type         = "SystemAssigned,UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.uai.id]
   }
 
   app_settings = {
     WEBSITES_PORT                              = "8080"
-    APPLICATIONINSIGHTS_CONNECTION_STRING      = module.application_insights.connection_string
+    APPLICATIONINSIGHTS_CONNECTION_STRING      = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.app_insights_conn_string.versionless_id})"
     ApplicationInsightsAgent_EXTENSION_VERSION = "~3"
   }
 
