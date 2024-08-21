@@ -55,8 +55,19 @@ resource "azurerm_key_vault" "keyvault" {
   }
 }
 
-# Set Keyvault access policy
-resource "azurerm_key_vault_access_policy" "keyvault_access_policy" {
+# Set Keyvault secrets get permission for SPN
+resource "azurerm_key_vault_access_policy" "keyvault_access_policy_spn" {
+  key_vault_id = azurerm_key_vault.keyvault.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = data.azurerm_client_config.current.object_id
+
+  secret_permissions = [
+    "Get",
+  ]
+}
+
+# Set Keyvault secrets get permission for Web app
+resource "azurerm_key_vault_access_policy" "keyvault_access_policy_app" {
   key_vault_id = azurerm_key_vault.keyvault.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = azurerm_linux_web_app.webapp.identity[0].principal_id
@@ -108,7 +119,7 @@ resource "azurerm_linux_web_app" "webapp" {
   }
 
   identity {
-    type         = "SystemAssigned,UserAssigned"
+    type         = "SystemAssigned, UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.uai.id]
   }
 
