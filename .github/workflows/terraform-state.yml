@@ -5,7 +5,7 @@ on:
 
 env:
   LOCATION: ${{ vars.APP_LOCATION }}
-  STATE_RG_NAME: "rg-${{ vars.APP_NAME }}-shared-${{ vars.APP_LOCATION }}"
+  STATE_RG_NAME: "rg-${{ vars.APP_NAME }}-shared-${{ vars.APP_LOCATION_SHORT }}"
   STATE_STORAGE_ACCOUNT_NAME: "st${{ vars.APP_NAME }}tfstates"
   STATE_CONTAINER_NAME: "tfstates"
 
