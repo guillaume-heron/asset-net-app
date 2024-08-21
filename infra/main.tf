@@ -55,29 +55,6 @@ resource "azurerm_key_vault" "keyvault" {
   }
 }
 
-# Set Keyvault secrets get permission for SPN
-resource "azurerm_key_vault_access_policy" "keyvault_access_policy_spn" {
-  key_vault_id = azurerm_key_vault.keyvault.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = data.azurerm_client_config.current.object_id
-
-  secret_permissions = [
-    "Get",
-    "Set",
-  ]
-}
-
-# Set Keyvault secrets get permission for Web app
-resource "azurerm_key_vault_access_policy" "keyvault_access_policy_app" {
-  key_vault_id = azurerm_key_vault.keyvault.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = azurerm_linux_web_app.webapp.identity[0].principal_id
-
-  secret_permissions = [
-    "Get",
-  ]
-}
-
 # Set keyvault secret for app insights connection string
 resource "azurerm_key_vault_secret" "app_insights_conn_string" {
   name         = "APPLICATIONINSIGHTS-CONNECTION-STRING"
@@ -135,9 +112,21 @@ resource "azurerm_linux_web_app" "webapp" {
   }
 }
 
-# Create a role assignment
-resource "azurerm_role_assignment" "ra" {
+# Create a role assignments
+resource "azurerm_role_assignment" "acrpull" {
   scope                = module.container_registry.id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_user_assigned_identity.uai.principal_id
+}
+
+resource "azurerm_role_assignment" "kv_secrets_user" {
+  scope                = azurerm_key_vault.keyvault.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_linux_web_app.webapp.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "kv_secrets_officer" {
+  scope                = azurerm_key_vault.keyvault.id
+  role_definition_name = "Key Vault Secrets Officer"
+  principal_id         = data.azurerm_client_config.current.object_id
 }
