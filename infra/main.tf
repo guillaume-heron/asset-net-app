@@ -63,6 +63,7 @@ resource "azurerm_key_vault_access_policy" "keyvault_access_policy_spn" {
 
   secret_permissions = [
     "Get",
+    "Set",
   ]
 }
 
