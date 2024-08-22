@@ -1,3 +1,7 @@
+variable "key_vault_name" {
+  description = "The name of the keyvault to be created"
+}
+
 variable "resource_group_name" {
   description = "The name of the main resource group, where all resources will be created"
 }
@@ -6,12 +10,10 @@ variable "location" {
   description = "The region where all the resources will be deployed"
 }
 
-variable "log_analytics_workspace_name" {
-  description = "The name of the log analytics workspace resource."
-}
-
-variable "application_insights_name" {
-  description = "The name of the app insights resource."
+variable "kv_secrets" {
+  type = map(string)
+  default = {}
+  description = "The list of secrets to be set on the keyvault"
 }
 
 variable "tags" {
