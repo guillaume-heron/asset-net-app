@@ -19,6 +19,10 @@ resource "azurerm_role_assignment" "kv_secrets_officer" {
   scope                = azurerm_key_vault.key_vault.id
   role_definition_name = "Key Vault Secrets Officer"
   principal_id         = data.azurerm_client_config.current.object_id
+
+  depends_on = [
+    azurerm_key_vault.key_vault
+  ]
 }
 
 resource "azurerm_key_vault_secret" "secrets" {
@@ -27,4 +31,8 @@ resource "azurerm_key_vault_secret" "secrets" {
   name         = "${each.key}"
   value        = "${each.value}"
   key_vault_id = azurerm_key_vault.key_vault.id
+
+  depends_on = [
+    azurerm_role_assignment.kv_secrets_officer
+  ]
 }
