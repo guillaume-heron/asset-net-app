@@ -1,8 +1,8 @@
 # Déploiement d'une Web API .Net et de l'infrastructure (Terraform) via Github Actions
 
-![infrastructure state deployment](https://github.com/guillaume-heron/asset-net-app/actions/workflows/terraform-state.yml/badge.svg)
-![infrastructure deployment](https://github.com/guillaume-heron/asset-net-app/actions/workflows/terraform-cd.yml/badge.svg)
-![webapp deployment](https://github.com/guillaume-heron/asset-net-app/actions/workflows/dotnet-webapp-deploy.yml/badge.svg)
+[![infrastructure state deployment](https://github.com/guillaume-heron/asset-net-app/actions/workflows/terraform-state.yml/badge.svg)](https://github.com/guillaume-heron/asset-net-app/actions/workflows/terraform-state.yml)
+[![infrastructure deployment](https://github.com/guillaume-heron/asset-net-app/actions/workflows/terraform-cd.yml/badge.svg)](https://github.com/guillaume-heron/asset-net-app/actions/workflows/terraform-cd.yml)
+[![webapp deployment](https://github.com/guillaume-heron/asset-net-app/actions/workflows/dotnet-webapp-deploy.yml/badge.svg)](https://github.com/guillaume-heron/asset-net-app/actions/workflows/dotnet-webapp-deploy.yml)
 
 
 ## Introduction
