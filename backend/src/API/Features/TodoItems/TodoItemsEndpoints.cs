@@ -1,3 +1,6 @@
+using API.Features.TodoItems.CreateTodoItem;
+using API.Features.TodoItems.GetTodoItem;
+
 namespace API.Features.TodoItems;
 
 public static class TodoItemsEndpoints
@@ -8,7 +11,7 @@ public static class TodoItemsEndpoints
             .WithTags("TodoItems")
             .WithOpenApi();
 
-        GetTodoItem.AddEndpoint(todoItems);
-        CreateTodoItem.AddEndpoint(todoItems);
+        GetTodoItemEndpoint.Add(todoItems);
+        CreateTodoItemEndpoint.Add(todoItems);
     }
 }
