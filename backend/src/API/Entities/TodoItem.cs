@@ -1,4 +1,4 @@
-namespace API.Domain;
+namespace API.Entities;
 
 public sealed class TodoItem
 {

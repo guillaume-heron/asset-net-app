@@ -1,12 +1,12 @@
 using FluentValidation;
 
-namespace API.Features.TodoItems.CreateTodoItem;
+namespace API.Contracts.Requests.CreateTodoItem;
 
-public class CreateTodoItemCommandValidator : AbstractValidator<CreateTodoItemCommand>
+public sealed class CreateTodoItemRequestValidator : AbstractValidator<CreateTodoItemRequest>
 {
     private const short NameFieldMinimumLength = 2;
 
-    public CreateTodoItemCommandValidator()
+    public CreateTodoItemRequestValidator()
     {
         RuleFor(c => c.Title)
             .NotEmpty()
