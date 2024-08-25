@@ -1,21 +1,26 @@
 using API.Shared.Result;
 
-namespace API.Shared.Extensions;
+namespace API.Contracts.Results;
 
-public static class ResultExtensions
+public static class FailureResults
 {
-    public static IResult ProblemDetails<T>(this Result<T> result)
+    public static IResult Problem<T>(Result<T> result)
     {
         if (result.IsSuccess)
         {
             throw new InvalidOperationException();
         }
 
-        return Results.Problem(
-            title: GetTitle(result.Error),
-            detail: GetDetail(result.Error),
-            extensions: GetErrors(result.Error),
-            statusCode: GetStatusCode(result.Error.Type));
+        return Problem(result.Error);
+    }
+
+    public static IResult Problem(Error error)
+    {
+        return TypedResults.Problem(
+            title: GetTitle(error),
+            detail: GetDetail(error),
+            extensions: GetErrors(error),
+            statusCode: GetStatusCode(error));
     }
 
     #region Private methods
@@ -54,9 +59,9 @@ public static class ResultExtensions
         return errors;
     }
 
-    private static int GetStatusCode(ErrorType type)
+    private static int GetStatusCode(Error error)
     {
-        return type switch
+        return error.Type switch
         {
             ErrorType.NotFound => StatusCodes.Status404NotFound,
             ErrorType.Conflict => StatusCodes.Status409Conflict,

@@ -1,4 +1,4 @@
-using API.Domain;
+using API.Entities;
 using API.Shared.Result;
 using MediatR;
 
